@@ -38,7 +38,8 @@ module Fastlane
           UI.message("Fetching the latest build number for version #{version_number}")
 
           begin
-            train = app.build_trains[version_number]
+            build_trains = app.build_trains(platform: params[:platform])
+            train = build_trains[version_number]
             build_nr = train.builds.map(&:build_version).map(&:to_i).sort.last
           rescue
             UI.user_error!("could not find a build on iTC - and 'initial_build_number' option is not set") unless params[:initial_build_number]
@@ -71,6 +72,14 @@ module Fastlane
                                        env_name: "FASTLANE_APP_IDENTIFIER",
                                        description: "The bundle identifier of your app",
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)),
+          FastlaneCore::ConfigItem.new(key: :platform,
+                                       short_option: "-m",
+                                       env_name: "FASTLANE_PLATFORM_NAME",
+                                       description: "The platform to use (optional)",
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The platform can only be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include? value
+                                       end),
           FastlaneCore::ConfigItem.new(key: :username,
                                        short_option: "-u",
                                        env_name: "ITUNESCONNECT_USER",

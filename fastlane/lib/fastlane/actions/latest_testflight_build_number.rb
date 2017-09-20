@@ -39,6 +39,14 @@ module Fastlane
                                        optional: true,
                                        is_string: false,
                                        default_value: false),
+          FastlaneCore::ConfigItem.new(key: :platform,
+                                       short_option: "-m",
+                                       env_name: "FASTLANE_PLATFORM_NAME",
+                                       description: "The platform to use (optional)",
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The platform can only be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include? value
+                                       end),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        short_option: "-a",
                                        env_name: "FASTLANE_APP_IDENTIFIER",
